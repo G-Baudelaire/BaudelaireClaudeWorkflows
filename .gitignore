@@ -9,7 +9,7 @@
 # Plugins: ignore the folders Claude Code manages itself, keep only our own
 /plugins/*
 !/plugins/tutor/
-!/plugins/coach/
+!/plugins/programming-coach/
 
 # Skills: ignore the synced ones from claude.ai, keep only our own (add as `!/skills/<name>/`)
 /skills/*

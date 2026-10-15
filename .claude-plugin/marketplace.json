@@ -11,9 +11,9 @@
       "description": "Teaches subjects by finding the edge of what you know and building understanding from there, with graded quizzes, a fact-checking researcher, a PDF book reader, and Obsidian session logging."
     },
     {
-      "name": "coach",
-      "source": "./plugins/coach",
-      "description": "Practice-mode skills. /coach:leetcode makes Claude coach with questions and hints instead of writing your solutions."
+      "name": "programming-coach",
+      "source": "./plugins/programming-coach",
+      "description": "Practice-mode skills. /programming-coach:coach makes Claude coach with questions and hints instead of writing your code, for LeetCode-style problems or any learning project."
     }
   ]
 }
