@@ -22,13 +22,6 @@ My Claude Code plugins and workflow files, kept in one place so I can reinstall 
 
 Type `/coach:leetcode` at the start of a practice session. It stays on until you say "stop coaching".
 
-## Rust learning
-
-- `rust-learning/CLAUDE.md` is a copy of the Rust LeetCode project's CLAUDE.md. Run `sh sync-rust-learning.sh` to refresh it before committing.
-- The project's memory files are tracked in place under `projects/C--Users-germa--RustroverProjects-RustLeetCode/memory/`, so they are always current.
-
-To restore on a new machine, copy `rust-learning/CLAUDE.md` into the project root. The memory folder comes back with the clone.
-
 ## How this repo is set up
 
 This repo lives in `~/.claude` itself. `.gitignore` ignores everything by default and re-includes only my own plugins and skills, so credentials, history and sessions can never be committed by accident. To track something new, add a `!` exception to `.gitignore` first.
