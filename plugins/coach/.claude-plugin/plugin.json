@@ -1,0 +1,8 @@
+{
+  "name": "coach",
+  "version": "0.1.0",
+  "description": "Practice-mode skills: Claude coaches through questions and hints instead of doing the work for you.",
+  "author": { "name": "Germain McCaulay-Jones" },
+  "license": "MIT",
+  "keywords": ["leetcode", "practice", "teaching", "coaching"]
+}
