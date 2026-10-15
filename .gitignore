@@ -1,5 +1,21 @@
+# Ignore everything in ~/.claude by default (credentials, history, sessions, caches...).
+# Only the paths re-included below are ever tracked.
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/.claude-plugin/
+
+# Plugins: ignore the folders Claude Code manages itself, keep only our own
+/plugins/*
+!/plugins/tutor/
+!/plugins/coach/
+
+# Skills: ignore the synced ones from claude.ai, keep only our own (add as `!/skills/<name>/`)
+/skills/*
+
+# Junk inside our own plugins
 .venv/
 __pycache__/
 *.pyc
 node_modules/
-.claude/settings.local.json
