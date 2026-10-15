@@ -5,6 +5,15 @@
 !/README.md
 !/LICENSE
 !/.claude-plugin/
+!/sync-rust-learning.sh
+
+# Rust learning: CLAUDE.md is copied in by sync-rust-learning.sh; memory is tracked in place
+!/rust-learning/
+!/projects/
+/projects/*
+!/projects/C--Users-germa--RustroverProjects-RustLeetCode/
+/projects/C--Users-germa--RustroverProjects-RustLeetCode/*
+!/projects/C--Users-germa--RustroverProjects-RustLeetCode/memory/
 
 # Plugins: ignore the folders Claude Code manages itself, keep only our own
 /plugins/*
