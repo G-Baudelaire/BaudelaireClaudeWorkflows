@@ -1,0 +1,3 @@
+- [Teaching approach: guide, don't solve](feedback_teaching_approach.md) — prioritize learning over completion
+- [Rust learner, experienced programmer](user_rust_learner.md) — new to Rust, strong Python/C++ background
+- [Rust concepts taught](rust-concepts-taught.md) — tracks what's been covered to build incrementally

@@ -1,0 +1,12 @@
+{
+  "name": "baudelaire-workflows",
+  "owner": { "name": "Germain McCaulay-Jones" },
+  "description": "Germain's personal collection of Claude Code plugins and workflow files.",
+  "plugins": [
+    {
+      "name": "tutor",
+      "source": "./plugins/tutor",
+      "description": "Teaches subjects by finding the edge of what you know and building understanding from there, with graded quizzes, a fact-checking researcher, a PDF book reader, and Obsidian session logging."
+    }
+  ]
+}

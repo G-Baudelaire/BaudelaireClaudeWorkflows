@@ -1,0 +1,9 @@
+{
+  "name": "tutor",
+  "version": "0.2.0",
+  "description": "Teaches subjects by finding the edge of what you know and building understanding from there. Includes graded quizzes, a fact-checking researcher, a PDF book reader, and Obsidian session logging.",
+  "author": { "name": "Germain McCaulay-Jones" },
+  "license": "MIT",
+  "keywords": ["teaching", "learning", "tutor", "quiz", "pdf", "obsidian"],
+  "types": "./types/index.d.ts"
+}
