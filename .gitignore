@@ -7,6 +7,7 @@
 !/.claude-plugin/
 
 # Plugins: ignore the folders Claude Code manages itself, keep only our own
+!/plugins/
 /plugins/*
 !/plugins/tutor/
 !/plugins/programming-coach/
