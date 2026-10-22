@@ -1,0 +1,8 @@
+{
+  "name": "flash-cards",
+  "version": "0.1.0",
+  "description": "Create and improve Anki flashcards as .apkg files, with Korean text-to-speech audio.",
+  "author": {
+    "name": "Germain Jones"
+  }
+}

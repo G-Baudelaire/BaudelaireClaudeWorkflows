@@ -1,0 +1,5 @@
+/venv
+.DS_Store
+*.apkg
+__pycache__/
+/voices
