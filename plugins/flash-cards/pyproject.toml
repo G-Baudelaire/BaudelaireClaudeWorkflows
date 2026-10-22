@@ -1,0 +1,18 @@
+[project]
+name = "flash-cards"
+version = "0.1.0" # keep in step with .claude-plugin/plugin.json
+description = "Create and improve Anki flashcards as .apkg files, with Korean text-to-speech audio."
+requires-python = ">=3.11"
+dependencies = [
+    "anki==26.8.1",     # match the desktop Anki version, or imports can misbehave
+    "piper-tts==1.8.0", # the espeak-ng cache dir is named after this version
+]
+
+[project.scripts]
+anki-io = "flash_cards.anki_utilities.anki_io:main"
+build-apkg = "flash_cards.anki_utilities.build_apkg:main"
+lint-cards = "flash_cards.anki_utilities.lint_cards:main"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14"]
+build-backend = "uv_build"

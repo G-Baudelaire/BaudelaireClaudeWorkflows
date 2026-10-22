@@ -6,11 +6,17 @@
 !/LICENSE
 !/.claude-plugin/
 
+# uv workspace for the Python plugins
+!/pyproject.toml
+!/uv.lock
+!/.python-version
+
 # Plugins: ignore the folders Claude Code manages itself, keep only our own
 !/plugins/
 /plugins/*
 !/plugins/tutor/
 !/plugins/programming-coach/
+!/plugins/flash-cards/
 
 # Skills: ignore the synced ones from claude.ai, keep only our own (add as `!/skills/<name>/`)
 /skills/*
@@ -20,3 +26,7 @@
 __pycache__/
 *.pyc
 node_modules/
+.ruff_cache/
+.pytest_cache/
+.DS_Store
+*.apkg
