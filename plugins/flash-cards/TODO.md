@@ -20,7 +20,7 @@
 | Distribution | Claude Code plugin in the personal marketplace. Claude Code only.                                                  |
 | Dependencies | `uv run` with inline PEP 723 deps. Voice model downloaded on first use into a cache dir. Requires `uv` + `ffmpeg`. |
 | Layering     | Note generation imports TTS. TTS never imports note/Anki code.                                                     |
-| Skills       | One plugin, two skills: generic `create-flash-cards` + new `korean-vocab`, sharing scripts.                        |
+| Skills       | One plugin, one skill: `create-flash-cards`. TTS is one of its scripts, used when a note type has audio fields.    |
 | Anki I/O     | Files only: `.apkg` (or GUID TSV) in, `.apkg` out. No AnkiConnect.                                                 |
 | Sharing      | You're the only editor. Collaborators import your `.apkg` on desktop Anki ≥ 23.10, then sync to mobile.            |
 | Input        | KO + EN pairs. Claude flags suspect pairs (typos, wrong meaning) but doesn't change them.                          |
@@ -60,18 +60,25 @@
 
 ```
 .claude-plugin/plugin.json
-skills/create-flash-cards/      SKILL.md, references/   (generic, existing)
-skills/korean-vocab/            SKILL.md                (new)
-scripts/                        shared, run as `uv run ${CLAUDE_PLUGIN_ROOT}/scripts/…`
-  tts.py                        normalise → Piper → ffmpeg → mp3. No imports from the other scripts.
-  anki_io.py  build_apkg.py  lint_cards.py   (build_apkg imports tts)
-assets/notetypes.json
+skills/create-flash-cards/
+  SKILL.md
+  references/  card-rules.md  anki-format.md  korean-vocab.md (new)
+  scripts/     run as `uv run ${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/scripts/…`
+    tts.py     normalise → Piper → ffmpeg → mp3. No imports from the other scripts.
+    anki_io.py  build_apkg.py  lint_cards.py   (build_apkg imports tts)
+  assets/notetypes.json
 ```
+
+The plugin wrapper is only there for marketplace distribution. `SKILL.md` lists
+TTS as an option: when a note type has `Audio`/`AudioSlow` fields,
+`build_apkg.py` fills them. The Korean specifics (pair flagging, homonyms,
+collaborator import steps) live in `references/korean-vocab.md`, which is read
+only for Korean decks.
 
 - [ ] Restructure the repo. Remove `venv/`, `install.sh`, `voices/` and
       `requirements.txt` in favour of the PEP 723 headers.
-- [ ] Update `SKILL.md` paths to `${CLAUDE_PLUGIN_ROOT}` and send output to the
-      user's cwd.
+- [ ] Update `SKILL.md` paths to `${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/`
+      and send output to the user's cwd.
 - [x] `tts.py`: voice + short-path espeak-ng data cached in
       `~/.cache/korean-flashcards/` on first use; clear error if `ffmpeg` is
       missing (done in `research/tts.py`, port as-is).
@@ -115,9 +122,11 @@ Tasks:
       to keep them small and only touch notes that were actually edited.
 - [ ] Merge: dedupe incoming pairs against the deck (Korean or English match),
       then report new / duplicate / flagged pairs.
-- [ ] `korean-vocab/SKILL.md`: inputs (pairs + `.apkg` export), pair-flagging
+- [ ] `references/korean-vocab.md`: inputs (pairs + `.apkg` export), pair-flagging
       rules, homonym sense in English (눈 → "eye (body)" vs "snow"), tag/subdeck
-      behaviour, and import steps for you and your collaborators.
+      behaviour, and import steps for you and your collaborators. Add a pointer
+      to it and the TTS option to `SKILL.md`, plus Korean triggers in its
+      `description`.
 
 **Workflow:** export the deck as `.apkg` (no scheduling) + pairs → Claude →
 `.apkg` → everyone imports (update notes on, Merge note types on).
@@ -186,7 +195,8 @@ uv run dry_run.py <COPY of collection.anki2> ../KoreanMigration.apkg
   `sqlite3 "file:$HOME/Library/Application Support/Anki2/User 1/collection.anki2?mode=ro" ".backup '<dest>'"`.
   Never run `dry_run.py` on the live file.
 - `research/merge_notetype_test.py` is the original proof that the merge preserves history.
-- The `research/` prototypes become `scripts/tts.py` and `scripts/build_apkg.py` in §2/§3.
+- The `research/` prototypes become `skills/create-flash-cards/scripts/tts.py` and
+  `…/build_apkg.py` in §2/§3.
 - `KoreanTest.apkg` and `KoreanMigration.apkg` are local build artefacts (gitignored).
 - `venv/`, `voices/`, `install.sh`, `requirements.txt` and `main.py` are now unused.
   Delete them in the §2 restructure.
