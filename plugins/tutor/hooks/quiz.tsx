@@ -45,6 +45,7 @@ export const QUIZ_TOOL = {
     '- `correct` is copied exactly from `options`. For several correct options set `multiSelect` to true and pass a list; it is graded as an exact set.\n' +
     '- Options are shuffled for you. Set `shuffle` to false only when order matters (ordered values, "All of the above").\n' +
     '- Do NOT add an "I don\'t know" option. The learner types "idk" under Other, and you get back a don\'t-know result: a genuine gap, not a wrong answer. Anything else they type under Other comes back as a note.\n' +
+    '- Code in a question goes in a fenced block with a language tag (```python), never bare indented lines: the session note renders markdown, and bare code loses its indentation there.\n' +
     '- Option labels cannot contain commas.',
   inputSchema: {
     type: 'object',
