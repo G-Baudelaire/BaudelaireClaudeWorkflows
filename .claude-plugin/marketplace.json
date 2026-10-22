@@ -14,6 +14,11 @@
       "name": "programming-coach",
       "source": "./plugins/programming-coach",
       "description": "Practice-mode skills. /programming-coach:coach makes Claude coach with questions and hints instead of writing your code, for LeetCode-style problems or any learning project."
+    },
+    {
+      "name": "flash-cards",
+      "source": "./plugins/flash-cards",
+      "description": "Create and improve Anki flashcards as .apkg files, with Korean text-to-speech audio. Needs uv and ffmpeg."
     }
   ]
 }

@@ -21,3 +21,6 @@
 __pycache__/
 *.pyc
 node_modules/
+.ruff_cache/
+.DS_Store
+*.apkg
