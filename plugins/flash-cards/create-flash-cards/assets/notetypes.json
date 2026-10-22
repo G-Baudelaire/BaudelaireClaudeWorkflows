@@ -1,0 +1,87 @@
+{
+  "_comment": [
+    "Canonical note types for decks built by this skill. Reuse them verbatim.",
+    "The ids are load-bearing: Anki's .apkg importer matches note types by id, and a",
+    "fresh timestamp id guarantees a 'Name+' fork in the user's collection.",
+    "NEVER change the fields or templates of a note type the user already has. A schema",
+    "difference forks it to 'Name+' unless the user ticks 'Merge notetypes' in the import",
+    "dialog, and that checkbox DEFAULTS TO OFF - so the fork is the normal outcome.",
+    "If you need a different card shape, add a NEW note type with a new id: one the",
+    "collection has never seen installs cleanly on default settings."
+  ],
+  "notetypes": {
+    "basic": {
+      "name": "Basic (skill: front/back/extra)",
+      "id": 1607392319,
+      "kind": "standard",
+      "fields": [
+        "Front",
+        "Back",
+        "Extra"
+      ],
+      "sortf": 0,
+      "templates": [
+        {
+          "name": "Card 1",
+          "qfmt": "{{Front}}",
+          "afmt": "{{FrontSide}}<hr id=\"answer\">{{Back}}{{#Extra}}<br><br><div class=\"extra\">{{Extra}}</div>{{/Extra}}"
+        }
+      ],
+      "css": "\n.card {\n  --fg: #1a1a1a;\n  --bg: #fdfdfd;\n  --code-bg: #f0f0f2;\n  --rule: #b9b9c0;\n  --accent: #2b6cb0;\n  font-family: -apple-system, Segoe UI, Roboto, sans-serif;\n  font-size: 18px;\n  text-align: left;\n  color: var(--fg);\n  background-color: var(--bg);\n  padding: 12px 18px;\n}\n.card.nightMode, .card.night_mode {\n  --fg: #e8e8ea;\n  --bg: #2c2c2e;\n  --code-bg: #3a3a3d;\n  --rule: #6b6b73;\n  --accent: #8ab4f8;\n}\ncode {\n  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;\n  font-size: 0.92em;\n  color: var(--fg);\n  background: var(--code-bg);\n  border-radius: 3px;\n  padding: 1px 4px;\n}\n.code {\n  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;\n  font-size: 0.9em;\n  color: var(--fg);\n  background: var(--code-bg);\n  border-left: 3px solid var(--rule);\n  border-radius: 3px;\n  padding: 10px 12px;\n  margin: 8px 0;\n  white-space: normal;\n  overflow-x: auto;\n}\n.code code { background: none; padding: 0; }\n.cloze { font-weight: bold; color: var(--accent); }\nhr#answer { margin: 14px 0; border: none; border-top: 1px solid var(--rule); }\n"
+    },
+    "cloze": {
+      "name": "Cloze (skill)",
+      "id": 1607392320,
+      "kind": "cloze",
+      "fields": [
+        "Text",
+        "Back Extra"
+      ],
+      "sortf": 0,
+      "templates": [
+        {
+          "name": "Cloze",
+          "qfmt": "{{cloze:Text}}",
+          "afmt": "{{cloze:Text}}{{#Back Extra}}<br><br>{{Back Extra}}{{/Back Extra}}"
+        }
+      ],
+      "css": "\n.card {\n  --fg: #1a1a1a;\n  --bg: #fdfdfd;\n  --code-bg: #f0f0f2;\n  --rule: #b9b9c0;\n  --accent: #2b6cb0;\n  font-family: -apple-system, Segoe UI, Roboto, sans-serif;\n  font-size: 18px;\n  text-align: left;\n  color: var(--fg);\n  background-color: var(--bg);\n  padding: 12px 18px;\n}\n.card.nightMode, .card.night_mode {\n  --fg: #e8e8ea;\n  --bg: #2c2c2e;\n  --code-bg: #3a3a3d;\n  --rule: #6b6b73;\n  --accent: #8ab4f8;\n}\ncode {\n  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;\n  font-size: 0.92em;\n  color: var(--fg);\n  background: var(--code-bg);\n  border-radius: 3px;\n  padding: 1px 4px;\n}\n.code {\n  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;\n  font-size: 0.9em;\n  color: var(--fg);\n  background: var(--code-bg);\n  border-left: 3px solid var(--rule);\n  border-radius: 3px;\n  padding: 10px 12px;\n  margin: 8px 0;\n  white-space: normal;\n  overflow-x: auto;\n}\n.code code { background: none; padding: 0; }\n.cloze { font-weight: bold; color: var(--accent); }\nhr#answer { margin: 14px 0; border: none; border-top: 1px solid var(--rule); }\n"
+    },
+    "basic_reversed": {
+      "name": "Basic reversed (skill)",
+      "id": 1607392321,
+      "kind": "standard",
+      "fields": [
+        "Front",
+        "Back",
+        "Extra"
+      ],
+      "sortf": 0,
+      "css": "\n.card {\n  --fg: #1a1a1a;\n  --bg: #fdfdfd;\n  --code-bg: #f0f0f2;\n  --rule: #b9b9c0;\n  --accent: #2b6cb0;\n  font-family: -apple-system, Segoe UI, Roboto, sans-serif;\n  font-size: 18px;\n  text-align: left;\n  color: var(--fg);\n  background-color: var(--bg);\n  padding: 12px 18px;\n}\n.card.nightMode, .card.night_mode {\n  --fg: #e8e8ea;\n  --bg: #2c2c2e;\n  --code-bg: #3a3a3d;\n  --rule: #6b6b73;\n  --accent: #8ab4f8;\n}\ncode {\n  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;\n  font-size: 0.92em;\n  color: var(--fg);\n  background: var(--code-bg);\n  border-radius: 3px;\n  padding: 1px 4px;\n}\n.code {\n  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;\n  font-size: 0.9em;\n  color: var(--fg);\n  background: var(--code-bg);\n  border-left: 3px solid var(--rule);\n  border-radius: 3px;\n  padding: 10px 12px;\n  margin: 8px 0;\n  white-space: normal;\n  overflow-x: auto;\n}\n.code code { background: none; padding: 0; }\n.cloze { font-weight: bold; color: var(--accent); }\nhr#answer { margin: 14px 0; border: none; border-top: 1px solid var(--rule); }\n",
+      "templates": [
+        {
+          "name": "Card 1",
+          "qfmt": "{{Front}}",
+          "afmt": "{{FrontSide}}<hr id=\"answer\">{{Back}}{{#Extra}}<br><br><div class=\"extra\">{{Extra}}</div>{{/Extra}}"
+        },
+        {
+          "name": "Card 2",
+          "qfmt": "{{Back}}",
+          "afmt": "{{FrontSide}}<hr id=\"answer\">{{Front}}{{#Extra}}<br><br><div class=\"extra\">{{Extra}}</div>{{/Extra}}"
+        }
+      ]
+    }
+  },
+  "html_conventions": {
+    "inline_code": "<code>SELECT</code>",
+    "code_block": "<div class=\"code\">line one<br>&nbsp; &nbsp; indented line</div>",
+    "code_block_note": "The .code CSS sets white-space:normal, so line breaks MUST be <br> and indentation MUST be &nbsp; pairs. <pre> is NOT styled by these note types - do not use it.",
+    "example_label": "<b>Example</b><br>",
+    "field_split": "Front = the question. Back = the answer alone, kept short. Extra = elaboration, contrasts and examples (rules 4 and 7), rendered below a rule.",
+    "reversible": "Use the 'basic_reversed' note type for cards worth drilling in both directions. Keep Back bare on those - it becomes the FRONT of the reverse card, so any elaboration there gives the answer away. Put it in Extra or a separate card."
+  },
+  "known_collection_notetype_ids": {
+    "_comment": "Stock note type ids seen in the user's own collection, for decks that must use a stock type instead of the skill's.",
+    "Basic": 1747648970785
+  }
+}
