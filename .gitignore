@@ -11,6 +11,7 @@
 /plugins/*
 !/plugins/tutor/
 !/plugins/programming-coach/
+!/plugins/flash-cards/
 
 # Skills: ignore the synced ones from claude.ai, keep only our own (add as `!/skills/<name>/`)
 /skills/*
