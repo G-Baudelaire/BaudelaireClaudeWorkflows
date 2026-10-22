@@ -1,23 +1,19 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = ["anki==26.8.1"]
-# ///
 """Build an Anki .apkg from deck JSON, using this skill's canonical note types.
 
 Why this exists: a plain TSV import makes the user pick a note type by hand, and
 cloze cards silently break if they land on a Basic type. An .apkg carries the note
 type, its templates and its CSS with it, so the deck renders correctly on import.
 
-The note types live in ../assets/notetypes.json and MUST be reused verbatim. Their
-ids are load-bearing (see "Note type identity" in references/anki-format.md).
+The note types live in notetypes.json next to this module and MUST be reused
+verbatim. Their ids are load-bearing (see "Note type identity" in
+skills/create-flash-cards/references/anki-format.md).
 
 Usage:
-    uv run build_apkg.py deck.json -o out.apkg
-    uv run build_apkg.py deck.json -o out.apkg --deck "Technical Aspects::SQL"
-    uv run build_apkg.py deck.json -o out.apkg --verify
+    uv run build-apkg deck.json -o out.apkg
+    uv run build-apkg deck.json -o out.apkg --deck "Technical Aspects::SQL"
+    uv run build-apkg deck.json -o out.apkg --verify
 
-Input JSON — either the shape anki_io.py emits, or:
+Input JSON — either the shape anki-io emits, or:
     {"deck": "Technical Aspects::SQL",
      "notes": [{"fields": ["front", "back", "extra"], "tags": ["sql::joins"]},
                {"fields": ["Text with {{c1::blank}}", "back extra"],
@@ -36,6 +32,7 @@ import os
 import re
 import sys
 import tempfile
+from importlib.resources import files
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -43,8 +40,7 @@ if TYPE_CHECKING:
     from anki.models import NotetypeDict
 
 CLOZE_RE = re.compile(r"\{\{c\d+::")
-ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "assets",
-                      "notetypes.json")
+NOTETYPES = files(__package__) / "notetypes.json"
 
 
 # ---------------------------------------------------------------- HTML helpers
@@ -79,8 +75,7 @@ def inline(s: str) -> str:
 # ---------------------------------------------------------------- note types
 
 def load_notetypes() -> dict[str, dict[str, Any]]:
-    with open(ASSETS, encoding="utf-8") as fh:
-        return json.load(fh)["notetypes"]
+    return json.loads(NOTETYPES.read_text(encoding="utf-8"))["notetypes"]
 
 
 def install(col: Collection, spec: dict[str, Any]) -> NotetypeDict:

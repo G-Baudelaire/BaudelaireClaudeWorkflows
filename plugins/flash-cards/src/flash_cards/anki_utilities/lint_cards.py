@@ -1,11 +1,6 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = []
-# ///
 """Flag mechanical violations of the 8 flashcard rules in a deck.
 
-Input is the JSON produced by `anki_io.py to-json` (or the deck file itself,
+Input is the JSON produced by `anki-io to-json` (or the deck file itself,
 which is converted internally). Output is a markdown report plus a JSON summary.
 
 The checks look at *shape*, not meaning: they cannot tell whether a back
@@ -13,21 +8,18 @@ actually answers its front, whether a fact is correct, or whether a card is
 worth having. Treat every flag as a prompt to read the card, not a verdict.
 
 Usage:
-    uv run lint_cards.py deck.json --report lint.md
-    uv run lint_cards.py deck.txt  --report lint.md --json lint.json
+    uv run lint-cards deck.json --report lint.md
+    uv run lint-cards deck.txt  --report lint.md --json lint.json
 """
 
 import argparse
 import json
-import os
 import re
-import sys
 from collections import Counter, defaultdict
 from collections.abc import Iterable
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from anki_io import read_deck
-from checks import (
+from .anki_io import read_deck
+from .checks import (
     Check,
     Code,
     Flag,
@@ -48,7 +40,7 @@ from checks import (
     untagged,
     vague_back,
 )
-from protocols import Note
+from .protocols import Note
 
 DEFAULT_CHECKS: tuple[Check, ...] = (
     empty_front,
@@ -78,7 +70,7 @@ def parse_args() -> argparse.Namespace:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     _ = argument_parser.add_argument(
-        "path", help="deck JSON (from anki_io.py to-json) or a deck .txt/.tsv/.csv"
+        "path", help="deck JSON (from anki-io to-json) or a deck .txt/.tsv/.csv"
     )
     _ = argument_parser.add_argument("--report", help="write markdown report here")
     _ = argument_parser.add_argument(

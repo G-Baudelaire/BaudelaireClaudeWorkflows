@@ -1,0 +1,177 @@
+{
+  "total_notes": 12,
+  "flagged_notes": 10,
+  "counts": {
+    "empty_front (rule 5)": 1,
+    "untagged (rule 8)": 2,
+    "multi_question (rule 1)": 1,
+    "vague_back (rule 5)": 2,
+    "thin_back (rule 4)": 3,
+    "long_front (rule 6)": 1,
+    "list_front (rule 1)": 1,
+    "no_example (rule 7)": 1,
+    "context_dependent (rule 3)": 1,
+    "dangling_pronoun (rule 3)": 1,
+    "broken_cloze (rule 2)": 3,
+    "field_count (rule -)": 1,
+    "stapled_front (rule 1)": 1,
+    "duplicate_front (rule 1)": 1
+  },
+  "notes": [
+    {
+      "index": 1,
+      "front": "",
+      "flags": [
+        {
+          "rule": "5",
+          "code": "empty_front",
+          "detail": "note has no first field"
+        },
+        {
+          "rule": "8",
+          "code": "untagged",
+          "detail": "no topical tag"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "front": "What is a join? And what is a key?",
+      "flags": [
+        {
+          "rule": "1",
+          "code": "multi_question",
+          "detail": "2 question marks on the front"
+        },
+        {
+          "rule": "5",
+          "code": "vague_back",
+          "detail": "back reads as a placeholder: 'TBD'"
+        },
+        {
+          "rule": "4",
+          "code": "thin_back",
+          "detail": "1 words, conceptual question"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "front": "What is the difference between a clustered and a non clustered index and how does the planner choose",
+      "flags": [
+        {
+          "rule": "6",
+          "code": "long_front",
+          "detail": "128 chars / 24 words"
+        },
+        {
+          "rule": "5",
+          "code": "vague_back",
+          "detail": "back reads as a placeholder: 'it depends'"
+        },
+        {
+          "rule": "4",
+          "code": "thin_back",
+          "detail": "2 words, conceptual question"
+        },
+        {
+          "rule": "8",
+          "code": "untagged",
+          "detail": "no topical tag"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "front": "Name three join types",
+      "flags": [
+        {
+          "rule": "1",
+          "code": "list_front",
+          "detail": "asks for a list — consider cloze or one card per item"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "front": "What is normalisation?",
+      "flags": [
+        {
+          "rule": "4",
+          "code": "thin_back",
+          "detail": "2 words, conceptual question"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "front": "Explain how an index speeds up lookups",
+      "flags": [
+        {
+          "rule": "7",
+          "code": "no_example",
+          "detail": "explanatory card with no example on the back"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "front": "This is shown in figure 3",
+      "flags": [
+        {
+          "rule": "3",
+          "code": "context_dependent",
+          "detail": "refers to material outside the card"
+        },
+        {
+          "rule": "3",
+          "code": "dangling_pronoun",
+          "detail": "front opens with an unanchored pronoun"
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "front": "{{c1::물 means water",
+      "flags": [
+        {
+          "rule": "2",
+          "code": "broken_cloze",
+          "detail": "unbalanced cloze braces"
+        },
+        {
+          "rule": "-",
+          "code": "field_count",
+          "detail": "3 fields, deck uses 2"
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "front": "{{ broken }} {{c",
+      "flags": [
+        {
+          "rule": "2",
+          "code": "broken_cloze",
+          "detail": "unbalanced cloze braces"
+        },
+        {
+          "rule": "2",
+          "code": "broken_cloze",
+          "detail": "cloze braces without a c-number"
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "front": "Part 1: what? Extra 2",
+      "flags": [
+        {
+          "rule": "1",
+          "code": "stapled_front",
+          "detail": "front bundles numbered sub-questions"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{"header": {}, "header_lines": [], "tags_column": 3, "notes": [
+ {"index": 0, "fields": ["사과", "apple"], "tags": ["korean::food"]},
+ {"index": 1, "fields": ["", "something"], "tags": []},
+ {"index": 2, "fields": ["What is a join? And what is a key?", "TBD"], "tags": ["sql"]},
+ {"index": 3, "fields": ["What is the difference between a clustered and a non clustered index and how does the planner choose and use them in practice ok", "it depends"], "tags": ["leech"]},
+ {"index": 4, "fields": ["Name three join types", "inner outer cross"], "tags": ["sql"]},
+ {"index": 5, "fields": ["What is normalisation?", "removing redundancy"], "tags": ["sql"]},
+ {"index": 6, "fields": ["Explain how an index speeds up lookups", "it keeps a sorted structure so the engine can binary search instead of scanning"], "tags": ["sql"]},
+ {"index": 7, "fields": ["This is shown in figure 3", "yes indeed it is"], "tags": ["sql"]},
+ {"index": 8, "fields": ["{{c1::물 means water", "", "extra"], "tags": ["korean"]},
+ {"index": 9, "fields": ["{{ broken }} {{c", "x"], "tags": ["korean"]},
+ {"index": 10, "fields": ["Part 1: what? Extra 2", "answer here"], "tags": ["x"]},
+ {"index": 11, "fields": ["사과", "apple"], "tags": ["korean::food"]}
+]}

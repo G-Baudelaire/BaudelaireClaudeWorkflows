@@ -1,0 +1,22 @@
+# Development workspace for the Python plugins. `uv sync` installs every member
+# (editable) plus the dev tools into one .venv at the repo root.
+#
+# Each member also works on its own: an installed plugin runs from a copy of its
+# folder with `uv run --project "${CLAUDE_PLUGIN_ROOT}" ...`, which builds a .venv
+# inside that copy. So a member must never depend on anything outside its folder.
+
+[tool.uv.workspace]
+members = ["plugins/flash-cards"]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.17"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+extend-select = ["SIM", "FURB", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["plugins/flash-cards/tests"]

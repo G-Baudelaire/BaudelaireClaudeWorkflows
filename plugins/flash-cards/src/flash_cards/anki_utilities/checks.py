@@ -3,7 +3,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 
-from protocols import Note
+from .protocols import Note
 
 FRONT_CHAR_LIMIT = 120  # ~2 rendered lines
 FRONT_WORD_LIMIT = 22

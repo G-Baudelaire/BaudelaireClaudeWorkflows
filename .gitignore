@@ -6,6 +6,11 @@
 !/LICENSE
 !/.claude-plugin/
 
+# uv workspace for the Python plugins
+!/pyproject.toml
+!/uv.lock
+!/.python-version
+
 # Plugins: ignore the folders Claude Code manages itself, keep only our own
 !/plugins/
 /plugins/*
@@ -22,5 +27,6 @@ __pycache__/
 *.pyc
 node_modules/
 .ruff_cache/
+.pytest_cache/
 .DS_Store
 *.apkg

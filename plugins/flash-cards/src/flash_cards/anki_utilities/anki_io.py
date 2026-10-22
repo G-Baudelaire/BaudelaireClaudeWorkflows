@@ -1,8 +1,3 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = []
-# ///
 """Parse and write Anki plain-text deck exports without mangling them.
 
 Deck exports contain tabs, quoted multi-line fields and HTML, so they need a
@@ -11,10 +6,10 @@ JSON back to a deck file, validates a written file by re-parsing it, and prints
 quick stats.
 
 Usage:
-    uv run anki_io.py to-json   deck.txt  -o deck.json
-    uv run anki_io.py from-json deck.json -o deck_out.txt
-    uv run anki_io.py validate  deck_out.txt
-    uv run anki_io.py stats     deck.txt
+    uv run anki-io to-json   deck.txt  -o deck.json
+    uv run anki-io from-json deck.json -o deck_out.txt
+    uv run anki-io validate  deck_out.txt
+    uv run anki-io stats     deck.txt
 
 JSON shape:
     {
@@ -41,7 +36,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from protocols import Note
+from .protocols import Note
 
 SEPARATORS = {
     "tab": "\t",
