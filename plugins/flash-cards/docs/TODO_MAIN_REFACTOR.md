@@ -1,6 +1,6 @@
 # TODO: refactor `main()` in `lint_cards.py`
 
-Goal: split `main()` in `skills/create-flash-cards/scripts/anki_utilities/lint_cards.py`
+Goal: split `main()` in `src/flash_cards/anki_utilities/lint_cards.py`
 into helper functions and classes. The report and JSON output must not change
 unless a decision below says otherwise.
 
@@ -13,10 +13,11 @@ unless a decision below says otherwise.
     `field_count(expected)`, which builds a check for each deck.
   - `lint_cards.py`: `DEFAULT_CHECKS`, `lint(note, checks)`, `main()`.
   - `anki_io.py`: `read_deck(path)` for `.txt`/`.tsv`/`.csv` decks.
-- Imports are absolute (`from checks import ...`), made possible by `sys.path.insert` of the script's own folder.
-  Don't use relative imports: the script runs standalone via `uv run lint_cards.py`.
+- `anki_utilities` is a package, so imports inside it are relative (`from .checks import ...`).
+  The script runs as the `lint-cards` entry point (`uv run lint-cards ...`).
 - `Code` needs Python 3.11+ (`StrEnum`), but the system `python3` is 3.10. Run with `uv run`.
-- Formatting is black. Ruff config also enables `SIM`/`FURB`/`RUF` rules.
+- Formatting is black (88 columns). The ruff config is in the repo-root `pyproject.toml`
+  and also enables `SIM`/`FURB`/`RUF` rules.
 
 ## The nine sections of `main()`
 
@@ -72,27 +73,15 @@ object, the markdown and the JSON could each be built from it independently.
 
 ## Verifying the refactor
 
-Take a baseline **before** changing anything, then diff the output afterwards.
+The baseline is already captured as a golden test:
 
-1. Save the test deck below as `lint_deck.json` somewhere outside the repo.
-   It triggers 14 of the 16 issue types; `conjunction_front` and `empty_back` aren't exercised.
-2. Baseline: `uv run lint_cards.py lint_deck.json --report base.md --json base.json`
-3. After the refactor: the same command into `new.md` / `new.json`, then
-   `diff base.md new.md && diff base.json new.json`. Both should be identical unless a decision above changed the output.
+- `tests/data/lint_deck.json` is the test deck. It triggers 14 of the 16 issue types;
+  `conjunction_front` and `empty_back` aren't exercised.
+- `tests/data/lint_expected.md` and `lint_expected.json` are its output from before the refactor.
+- `tests/test_lint_cards.py` runs `lint-cards` on the deck and compares.
 
-```json
-{"header": {}, "header_lines": [], "tags_column": 3, "notes": [
- {"index": 0, "fields": ["사과", "apple"], "tags": ["korean::food"]},
- {"index": 1, "fields": ["", "something"], "tags": []},
- {"index": 2, "fields": ["What is a join? And what is a key?", "TBD"], "tags": ["sql"]},
- {"index": 3, "fields": ["What is the difference between a clustered and a non clustered index and how does the planner choose and use them in practice ok", "it depends"], "tags": ["leech"]},
- {"index": 4, "fields": ["Name three join types", "inner outer cross"], "tags": ["sql"]},
- {"index": 5, "fields": ["What is normalisation?", "removing redundancy"], "tags": ["sql"]},
- {"index": 6, "fields": ["Explain how an index speeds up lookups", "it keeps a sorted structure so the engine can binary search instead of scanning"], "tags": ["sql"]},
- {"index": 7, "fields": ["This is shown in figure 3", "yes indeed it is"], "tags": ["sql"]},
- {"index": 8, "fields": ["{{c1::물 means water", "", "extra"], "tags": ["korean"]},
- {"index": 9, "fields": ["{{ broken }} {{c", "x"], "tags": ["korean"]},
- {"index": 10, "fields": ["Part 1: what? Extra 2", "answer here"], "tags": ["x"]},
- {"index": 11, "fields": ["사과", "apple"], "tags": ["korean::food"]}
-]}
-```
+1. Run `uv run pytest` from the repo root after each slice. It should pass unchanged
+   unless a decision above changes the output.
+2. If a decision changes the output on purpose, regenerate the expected files from
+   `plugins/flash-cards` and review the diff before committing:
+   `uv run lint-cards tests/data/lint_deck.json --report tests/data/lint_expected.md --json tests/data/lint_expected.json`

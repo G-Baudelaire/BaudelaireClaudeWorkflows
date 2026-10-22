@@ -18,7 +18,7 @@
 | Topic        | Decision                                                                                                           |
 | ------------ | ------------------------------------------------------------------------------------------------------------------ |
 | Distribution | Claude Code plugin in the personal marketplace. Claude Code only.                                                  |
-| Dependencies | `uv run` with inline PEP 723 deps. Voice model downloaded on first use into a cache dir. Requires `uv` + `ffmpeg`. |
+| Dependencies | The plugin is a uv project, run with `uv run --project`; in development it's a member of the repo's uv workspace. Voice model downloaded on first use into a cache dir. Requires `uv` + `ffmpeg`. |
 | Layering     | Note generation imports TTS. TTS never imports note/Anki code.                                                     |
 | Skills       | One plugin, one skill: `create-flash-cards`. TTS is one of its scripts, used when a note type has audio fields.    |
 | Anki I/O     | Files only: `.apkg` (or GUID TSV) in, `.apkg` out. No AnkiConnect.                                                 |
@@ -50,27 +50,32 @@
 | `SKILL.md`                  | Generic generate/improve workflow → lint → tag → `.apkg` → report.            | Nothing Korean-specific. Hardcoded claude.ai paths (`/home/claude`, `/mnt/user-data`). |
 | `references/card-rules.md`  | 8 card-design rules + rewrite patterns.                                       | No vocab guidance (homonyms, bare fields on reversible cards).                         |
 | `references/anki-format.md` | TSV format, note-type id rules, GUID vs first-field matching.                 | Scripts don't implement the GUID path. Nothing on merging note types.                  |
-| `assets/notetypes.json`     | `basic` (1607392319), `cloze` (…320), `basic_reversed` (…321), stock `Basic`. | `basic_reversed` never installed. No audio type.                                       |
-| `scripts/anki_utilities/anki_io.py`        | TSV/CSV ↔ JSON, preserves header lines + tags column.                         | `#guid`/`#notetype`/`#deck` columns treated as plain fields. Can't read `.apkg`.       |
-| `scripts/anki_utilities/build_apkg.py`     | JSON → `.apkg` with forced note-type ids, `--verify`.                         | Basic/cloze only. Fresh GUIDs every build. `with_media=False`.                         |
-| `scripts/anki_utilities/lint_cards.py`     | Shape checks.                                                                 | Fine as is.                                                                            |
+| `notetypes.json`            | `basic` (1607392319), `cloze` (…320), `basic_reversed` (…321), stock `Basic`. | `basic_reversed` never installed. No audio type.                                       |
+| `anki_io.py`                | TSV/CSV ↔ JSON, preserves header lines + tags column.                         | `#guid`/`#notetype`/`#deck` columns treated as plain fields. Can't read `.apkg`.       |
+| `build_apkg.py`             | JSON → `.apkg` with forced note-type ids, `--verify`.                         | Basic/cloze only. Fresh GUIDs every build. `with_media=False`.                         |
+| `lint_cards.py`             | Shape checks.                                                                 | Fine as is.                                                                            |
 | `main.py`                   | Piper TTS proof of concept.                                                   | Not wired in.                                                                          |
 
 ## 2. Plugin structure
 
 ```
-.claude-plugin/plugin.json
-skills/create-flash-cards/
-  SKILL.md
-  references/  card-rules.md  anki-format.md  korean-vocab.md (new)
-  scripts/     run as `uv run ${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/scripts/…`
-    anki_utilities/   anki_io.py  build_apkg.py  lint_cards.py   (build_apkg imports text_to_speech)
-    text_to_speech/   normalise → Piper → ffmpeg → mp3. No imports from the other scripts.
+plugins/flash-cards/            (in the BaudelaireClaudeWorkflows marketplace repo)
+  .claude-plugin/plugin.json
+  pyproject.toml                deps + entry points; a member of the repo's uv workspace
+  src/flash_cards/              run as `uv run --project "${CLAUDE_PLUGIN_ROOT}" <command>`
+    anki_utilities/   anki_io.py (anki-io)  build_apkg.py (build-apkg)  lint_cards.py (lint-cards)
+                      notetypes.json   (build_apkg imports text_to_speech)
+    text_to_speech/   normalise → Piper → ffmpeg → mp3. No imports from anki_utilities.
       constants.py           CACHE_DIR, VOICE, LetterReadings, Digits, Small/BigUnits
       text_normalisation.py  TextNormalisation: card text → speech text, Sino-Korean numbers
       cache_paths.py         CachePaths: audio file names + cache check, voice model, espeak data
       synthesizer.py         Synthesizer: Piper WAV → ffmpeg MP3, via CachePaths
-  assets/notetypes.json
+  skills/create-flash-cards/
+    SKILL.md
+    references/  card-rules.md  anki-format.md  korean-vocab.md (new)
+  tests/        lint golden test, build + verify test (`uv run pytest` from the repo root)
+  research/     PEP 723 migration prototypes
+  docs/         this file, TODO_MAIN_REFACTOR.md
 ```
 
 The plugin wrapper is only there for marketplace distribution. `SKILL.md` lists
@@ -82,17 +87,22 @@ only for Korean decks.
 - [x] Restructure the repo into the layout above, with PEP 723 headers on the
       scripts (`requires-python = ">=3.11"`). `install.sh`, `requirements.txt`
       and `main.py` removed.
-- [ ] Delete the untracked `venv/` and `voices/` by hand (the voice is already
-      cached in `~/.cache/korean-flashcards/voices/`), then drop their
-      `.gitignore` lines.
-- [x] Update `SKILL.md` paths to `${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/`
-      and send output to the user's cwd.
+- [x] Move into BaudelaireClaudeWorkflows as `plugins/flash-cards` (history
+      kept) and turn the scripts into the `flash_cards` package, a uv workspace
+      member. This replaced the PEP 723 headers and the `sys.path` hack.
+- [ ] Delete the old `~/Documents/Projects/KoreanFlashCardProducer` folder,
+      untracked `venv/` and `voices/` included (the voice is already cached in
+      `~/.cache/korean-flashcards/voices/`), once a fresh install works.
+- [x] Point `SKILL.md` at the plugin's commands
+      (`uv run --project "${CLAUDE_PLUGIN_ROOT}" …`) and send output to the
+      user's cwd.
 - [x] Port `research/tts.py` into the `text_to_speech/` package: voice +
       short-path espeak-ng data cached in `~/.cache/korean-flashcards/` on first
       use; clear error if `ffmpeg` is missing. Audio file names match the
       prototype, so the existing cache is reused. `research/tts.py` stays as the
       copy `build_migration.py` imports until §3 absorbs `research/`.
-- [ ] Add the plugin to the marketplace repo and test a fresh install.
+- [x] Add the plugin to the marketplace repo.
+- [ ] Test a fresh install from the marketplace.
 - [x] **Bug:** `anki_io.py`'s own CLI is broken since `read_deck` started
       returning a `Deck` dataclass (with `Note`s) instead of a dict. `to-json`
       crashes on `json.dumps(deck)` (a dataclass isn't serialisable; try
@@ -195,12 +205,12 @@ There's no script per collection.
 ## Handoff: reproducing the prototype
 
 Needs only `uv` and `ffmpeg`. Each script declares its dependencies (PEP 723), so there
-is no venv to manage:
+is no venv to manage. They run in their own environments, apart from the workspace:
 
 ```bash
-cd research
-uv run build_migration.py ../KoreanTest.apkg ../KoreanMigration.apkg
-uv run dry_run.py <COPY of collection.anki2> ../KoreanMigration.apkg
+cd plugins/flash-cards/research
+uv run build_migration.py ~/Documents/Anki/korean/KoreanTest.apkg ~/Documents/Anki/korean/KoreanMigration.apkg
+uv run dry_run.py <COPY of collection.anki2> ~/Documents/Anki/korean/KoreanMigration.apkg
 ```
 
 - The first run downloads the voice and copies espeak-ng data into
@@ -214,10 +224,10 @@ uv run dry_run.py <COPY of collection.anki2> ../KoreanMigration.apkg
   `sqlite3 "file:$HOME/Library/Application Support/Anki2/User 1/collection.anki2?mode=ro" ".backup '<dest>'"`.
   Never run `dry_run.py` on the live file.
 - `research/merge_notetype_test.py` is the original proof that the merge preserves history.
-- `research/tts.py` is now `skills/create-flash-cards/scripts/text_to_speech/`.
-  `research/build_migration.py` becomes `…/build_apkg.py` in §3.
-- `KoreanTest.apkg` and `KoreanMigration.apkg` are local build artefacts (gitignored).
-- `venv/` and `voices/` are unused and still need deleting by hand (see §2).
+- `research/tts.py` is now `src/flash_cards/text_to_speech/`.
+  `research/build_migration.py` becomes `build_apkg.py` in §3.
+- `KoreanTest.apkg` and `KoreanMigration.apkg` are local build artefacts, kept in
+  `~/Documents/Anki/korean/` (`*.apkg` is gitignored).
 
 ## Open questions
 

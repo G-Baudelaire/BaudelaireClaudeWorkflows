@@ -55,7 +55,7 @@ Anki follows the usual CSV quoting rules even in tab mode:
 - A literal `"` inside a quoted field is doubled: `""`.
 - Multi-line fields are legal *inside quotes* — an exported card whose back has newlines will span several physical lines.
 
-This is why decks must be parsed with a real CSV reader (`csv.reader(f, delimiter='\t')`), not `line.split('\t')`. `scripts/anki_utilities/anki_io.py` handles both directions; use it rather than hand-rolling.
+This is why decks must be parsed with a real CSV reader (`csv.reader(f, delimiter='\t')`), not `line.split('\t')`. The `anki-io` command handles both directions; use it rather than hand-rolling.
 
 Alternative to quoting: replace newlines inside fields with `<br>` and keep every note on one physical line. Cleaner to diff, and it's what most hand-maintained decks do.
 
@@ -89,7 +89,7 @@ Consequences:
 
 - **Never let the id be freshly generated.** A note type created in a scratch
   collection gets a timestamp id, which will never match the user's. Always force
-  the canonical ids from `assets/notetypes.json`. `scripts/anki_utilities/build_apkg.py` does this.
+  the canonical ids from `notetypes.json`. `build-apkg` does this.
 - **Same id → merges cleanly**, with no dialog options needed.
 - **Different id → forks to `Name+`**, whatever the dialog says.
 - **Same id but different fields or templates → also forks**, unless the user ticks
@@ -104,13 +104,13 @@ with a new id. A note type the collection has never seen has nothing to reconcil
 against, so it installs cleanly on default settings, and the user's existing note
 types are untouched.
 
-CSS-only edits fork too, for the same reason. Change the CSS in `assets/notetypes.json`
+CSS-only edits fork too, for the same reason. Change the CSS in `notetypes.json`
 only when every deck is being rebuilt anyway, and tell the user to tick Merge notetypes.
 
 If a deck must sit on one of the user's *stock* note types (Basic, Cloze, Basic
 and reversed card) rather than this skill's, you need that collection's id for it.
 Recover it from any `.apkg` they have exported that uses the type; there is no way
-to guess it. `assets/notetypes.json` records the ones already discovered under
+to guess it. `notetypes.json` records the ones already discovered under
 `known_collection_notetype_ids`. Add to that list whenever you learn another.
 
 Matching rules differ by format, which decides which one to ship:
@@ -191,4 +191,4 @@ In the import dialog the user should check: correct note type, correct deck, and
 | Cloze cards show `{{c1::…}}` | Note type isn't Cloze |
 | Mojibake (Ã©, â€™) | File not saved as UTF-8 |
 
-Always re-parse a generated file before delivering it (`anki_io.py validate`). Round-tripping catches quoting bugs that eyeballing does not.
+Always re-parse a generated file before delivering it (`anki-io validate`). Round-tripping catches quoting bugs that eyeballing does not.
