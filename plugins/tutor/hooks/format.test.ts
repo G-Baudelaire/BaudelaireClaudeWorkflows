@@ -51,6 +51,38 @@ describe('md-log formatting', () => {
     expect(out).toEqual(['> [!question] Question — Pick\n> Pick one?\n>\n> 1. A\n> 2. B'])
   })
 
+  test('fenced code and mermaid inside a question stay fenced, every line inside the callout', async () => {
+    const question = 'What runs?\n\n```python\nclass Dog:\n    def speak(self): return 1\n\nDog().speak()\n```'
+    const out = quizQuestionCallout({ question, shown: ['a', 'b'], multiSelect: false })
+    expect(out).toBe(
+      [
+        '> [!question] Quiz',
+        '> What runs?',
+        '>',
+        '> ```python',
+        '> class Dog:',
+        '>     def speak(self): return 1',
+        '>',
+        '> Dog().speak()',
+        '> ```',
+        '>',
+        '> 1. a',
+        '> 2. b',
+      ].join('\n'),
+    )
+  })
+
+  test('a tool_use_error result is not logged', async () => {
+    const names = new Map<string, string>([['q1', 'mcp__tutor__quiz']])
+    const result: Block = {
+      type: 'tool_result',
+      tool_use_id: 'q1',
+      is_error: true,
+      content: '<tool_use_error>quiz question 1 option labels cannot contain commas</tool_use_error>',
+    }
+    expect(renderRow('user', [result], names)).toEqual([])
+  })
+
   test('its result is recognised by tool_use id, and by the engine hint when the call was never seen', async () => {
     const names = new Map<string, string>([['t1', 'AskUserQuestion']])
     const result: Block = { type: 'tool_result', tool_use_id: 't1', content: 'User answered: A' }

@@ -93,7 +93,8 @@ The tool's own description lists the rules. The reason they exist is that "keep 
 1. **Every option is a bare claim, with no justification anywhere.** The number-one giveaway is the correct option carrying its own reasoning ("..., because it preserves X") while the distractors are bare, making it longer and more specific. Put *zero* "why" in any option; all reasoning goes in the `explanation` field, which only appears after the learner answers.
 2. **Write the correct claim first, then mutate it into each distractor.** Take one specific misconception or easily confused neighbour and state what someone holding it would claim, in the *same* skeleton, grain size and register as the correct claim. Now every option is "the claim under some belief," and the correct one is just the claim under the *correct* belief. Parallelism falls out by construction instead of being policed.
 3. Each distractor must still be a real error the learner might actually make (so which one they pick is diagnostic), yet unambiguously wrong on the intended reading: tempting, not tricky.
-4. **No asymmetric bolding.** Don't bold the key concept in one option and not the others; highlighting the term you are testing only in the correct answer flags it instantly. Either bold nothing, or bold the parallel term in every option.
+4. **Code goes in a fenced block with a language tag.** Any code in a `question` (or `AskUserQuestion` text) is wrapped in triple backticks, e.g. ```` ```python ````. The md-log mirror prefixes every line with `> ` and Obsidian renders fences inside callouts, but bare code loses its indentation there and reads as prose. Short inline code uses single backticks.
+5. **No asymmetric bolding.** Don't bold the key concept in one option and not the others; highlighting the term you are testing only in the correct answer flags it instantly. Either bold nothing, or bold the parallel term in every option.
 
 If, reading the finished set cold, you can still tell which is right without knowing the material, you skipped step 1 or 2. Regenerate; don't patch.
 
@@ -133,7 +134,7 @@ This is the highest-leverage step; don't rush it. With the learner's level and g
 
 A good plan is what makes the teaching feel inevitable instead of arbitrary.
 
-**Then present the plan in chat, always, before any teaching.** Two parts:
+**Then present the plan, always, before any teaching** (inside the approval question, see below). Two parts:
 
 1. **The approach, in prose.** What we'll cover, in what order, and why this way, given where their edge sits (Phase 1a) and what they are reaching for (Phase 1b). A few freeform sentences.
 2. **The dependency map.** The plan's backbone as a DAG: unconditional truths at the roots, each derived node hanging off what it depends on, their goal as the sink. Draw it as a small mermaid graph in a fenced block (Obsidian renders mermaid natively in the log). This map *is* the teaching order; Phase 3 builds it node by node. Keep it small: few nodes, short labels. A map, not the territory.
@@ -150,6 +151,8 @@ graph TD
 **Stress-test the roots before presenting.** For every node you are treating as foundational, ask: is this genuinely an unconditional truth *for this learner*, or a disguised theorem that itself derives from something simpler they would accept at face value? If it derives, push it down and extend the map. Never found the lesson on a mid-level fact. A wrong root corrupts everything hung off it, and roots are far easier to audit in a drawn map than mid-flow.
 
 **Then stop and wait for their go-ahead.** The presented plan is the learner's checkpoint: a wrong root or wrong scope is cheap to fix now and expensive mid-lesson. Ask with `AskUserQuestion` (for example: start as planned / change the scope / change the goal). Do not begin Phase 3 until they approve.
+
+**Text written in the same turn as a question dialog is not reliably visible.** The dialog opens over the chat, and the learner has reported not seeing a plan written just before `AskUserQuestion` (and the same for prose before a `quiz`). So the plan must live **inside the `AskUserQuestion` `question` field**: the approach in a few sentences, then the mermaid map in a fenced block. That is the one place the learner is certain to see it, and md-log writes it into the note as part of the question callout, where Obsidian renders the mermaid. Keep it compact (the dialog is small). Don't rely on a chat message before the call; if you also wrote one, the question must still stand on its own. Apply the same rule to anything else the learner must read to answer: code, a diagram, a definition goes in the `question`, not in the prose before it.
 
 ### Phase 3: Teach (the loop)
 
