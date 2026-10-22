@@ -156,6 +156,8 @@ export function renderRow(
   for (const block of content) {
     if (block.type !== 'tool_result') continue
     const id = String(block.tool_use_id)
+    // A rejected call (bad input) is harness noise, not part of the lesson; the retry is what gets logged.
+    if (textOf(block.content).includes('<tool_use_error>')) continue
     const name = names.get(id) ?? hintTool
     if (name === QA_TOOL) out.push(answerCallout(block))
     else if (name === QUIZ_TOOL_NAME) {

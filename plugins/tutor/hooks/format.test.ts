@@ -72,6 +72,17 @@ describe('md-log formatting', () => {
     )
   })
 
+  test('a tool_use_error result is not logged', async () => {
+    const names = new Map<string, string>([['q1', 'mcp__tutor__quiz']])
+    const result: Block = {
+      type: 'tool_result',
+      tool_use_id: 'q1',
+      is_error: true,
+      content: '<tool_use_error>quiz question 1 option labels cannot contain commas</tool_use_error>',
+    }
+    expect(renderRow('user', [result], names)).toEqual([])
+  })
+
   test('its result is recognised by tool_use id, and by the engine hint when the call was never seen', async () => {
     const names = new Map<string, string>([['t1', 'AskUserQuestion']])
     const result: Block = { type: 'tool_result', tool_use_id: 't1', content: 'User answered: A' }
