@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["anki==26.8.1"]
+# ///
 """Build an Anki .apkg from deck JSON, using this skill's canonical note types.
 
 Why this exists: a plain TSV import makes the user pick a note type by hand, and
@@ -9,9 +13,9 @@ The note types live in ../assets/notetypes.json and MUST be reused verbatim. The
 ids are load-bearing (see "Note type identity" in references/anki-format.md).
 
 Usage:
-    python3 build_apkg.py deck.json -o out.apkg
-    python3 build_apkg.py deck.json -o out.apkg --deck "Technical Aspects::SQL"
-    python3 build_apkg.py deck.json -o out.apkg --verify
+    uv run build_apkg.py deck.json -o out.apkg
+    uv run build_apkg.py deck.json -o out.apkg --deck "Technical Aspects::SQL"
+    uv run build_apkg.py deck.json -o out.apkg --verify
 
 Input JSON — either the shape anki_io.py emits, or:
     {"deck": "Technical Aspects::SQL",
@@ -22,8 +26,9 @@ Input JSON — either the shape anki_io.py emits, or:
 A note is treated as cloze when it sets "cloze": true, or when field 0 contains
 "{{c<n>::". Basic notes take 2 or 3 fields (Extra may be omitted).
 
-Requires the `anki` package: pip install anki --break-system-packages
 """
+
+from __future__ import annotations
 
 import argparse
 import json
@@ -31,15 +36,20 @@ import os
 import re
 import sys
 import tempfile
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from anki.collection import Collection
+    from anki.models import NotetypeDict
 
 CLOZE_RE = re.compile(r"\{\{c\d+::")
-ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets",
+ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "assets",
                       "notetypes.json")
 
 
 # ---------------------------------------------------------------- HTML helpers
 
-def code_block(text, indent_unit=2):
+def code_block(text: str, indent_unit: int = 2) -> str:
     """Render a code snippet as the <div class="code"> block these note types style.
 
     The .code CSS uses white-space:normal, so real newlines collapse — line breaks
@@ -55,28 +65,26 @@ def code_block(text, indent_unit=2):
     return '<div class="code">' + "<br>".join(out) + "</div>"
 
 
-def escape(s):
+def escape(s: str) -> str:
     """Escape only what breaks HTML, leaving existing entities alone."""
     return (s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
              .replace("&amp;nbsp;", "&nbsp;").replace("&amp;lt;", "&lt;")
              .replace("&amp;gt;", "&gt;").replace("&amp;amp;", "&amp;"))
 
 
-def inline(s):
+def inline(s: str) -> str:
     return "<code>" + escape(s) + "</code>"
 
 
 # ---------------------------------------------------------------- note types
 
-def load_notetypes():
+def load_notetypes() -> dict[str, dict[str, Any]]:
     with open(ASSETS, encoding="utf-8") as fh:
         return json.load(fh)["notetypes"]
 
 
-def install(col, spec):
+def install(col: Collection, spec: dict[str, Any]) -> NotetypeDict:
     """Create the note type with its canonical id, or return it if already present."""
-    from anki.models import NotetypeDict
-
     existing = col.models.get(spec["id"])
     if existing:
         return existing
@@ -105,7 +113,7 @@ def install(col, spec):
     return made
 
 
-def _force_id(col, old_id, new_id):
+def _force_id(col: Collection, old_id: int, new_id: int) -> None:
     """Rewrite a note type's id in place.
 
     Anki assigns a timestamp id on creation, but the id is what the .apkg importer
@@ -121,7 +129,8 @@ def _force_id(col, old_id, new_id):
 
 # ---------------------------------------------------------------- build
 
-def build(deck_json, out_path, deck_name=None):
+def build(deck_json: dict[str, Any] | list[dict[str, Any]], out_path: str,
+          deck_name: str | None = None) -> dict[str, Any]:
     from anki.collection import Collection, ExportAnkiPackageOptions, DeckIdLimit
     from anki.decks import DeckId
 
@@ -160,7 +169,7 @@ def build(deck_json, out_path, deck_name=None):
     return {"notes": len(notes), "cards": cards, "deck": deck_name, **counts}
 
 
-def verify(path):
+def verify(path: str) -> dict[str, Any]:
     """Re-import the package into a scratch collection and report what landed."""
     from anki.collection import Collection, ImportAnkiPackageRequest
 
@@ -185,7 +194,7 @@ def verify(path):
     return report
 
 
-def main():
+def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("input", help="deck JSON")

@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.10"
+# requires-python = ">=3.11"
 # dependencies = ["anki==26.8.1"]
 # ///
 import os, sys, tempfile, shutil

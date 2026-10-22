@@ -55,7 +55,7 @@ Anki follows the usual CSV quoting rules even in tab mode:
 - A literal `"` inside a quoted field is doubled: `""`.
 - Multi-line fields are legal *inside quotes* — an exported card whose back has newlines will span several physical lines.
 
-This is why decks must be parsed with a real CSV reader (`csv.reader(f, delimiter='\t')`), not `line.split('\t')`. `scripts/anki_io.py` handles both directions; use it rather than hand-rolling.
+This is why decks must be parsed with a real CSV reader (`csv.reader(f, delimiter='\t')`), not `line.split('\t')`. `scripts/anki_utilities/anki_io.py` handles both directions; use it rather than hand-rolling.
 
 Alternative to quoting: replace newlines inside fields with `<br>` and keep every note on one physical line. Cleaner to diff, and it's what most hand-maintained decks do.
 
@@ -89,7 +89,7 @@ Consequences:
 
 - **Never let the id be freshly generated.** A note type created in a scratch
   collection gets a timestamp id, which will never match the user's. Always force
-  the canonical ids from `assets/notetypes.json`. `scripts/build_apkg.py` does this.
+  the canonical ids from `assets/notetypes.json`. `scripts/anki_utilities/build_apkg.py` does this.
 - **Same id → merges cleanly**, with no dialog options needed.
 - **Different id → forks to `Name+`**, whatever the dialog says.
 - **Same id but different fields or templates → also forks**, unless the user ticks

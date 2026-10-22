@@ -51,9 +51,9 @@
 | `references/card-rules.md`  | 8 card-design rules + rewrite patterns.                                       | No vocab guidance (homonyms, bare fields on reversible cards).                         |
 | `references/anki-format.md` | TSV format, note-type id rules, GUID vs first-field matching.                 | Scripts don't implement the GUID path. Nothing on merging note types.                  |
 | `assets/notetypes.json`     | `basic` (1607392319), `cloze` (…320), `basic_reversed` (…321), stock `Basic`. | `basic_reversed` never installed. No audio type.                                       |
-| `scripts/anki_io.py`        | TSV/CSV ↔ JSON, preserves header lines + tags column.                         | `#guid`/`#notetype`/`#deck` columns treated as plain fields. Can't read `.apkg`.       |
-| `scripts/build_apkg.py`     | JSON → `.apkg` with forced note-type ids, `--verify`.                         | Basic/cloze only. Fresh GUIDs every build. `with_media=False`.                         |
-| `scripts/lint_cards.py`     | Shape checks.                                                                 | Fine as is.                                                                            |
+| `scripts/anki_utilities/anki_io.py`        | TSV/CSV ↔ JSON, preserves header lines + tags column.                         | `#guid`/`#notetype`/`#deck` columns treated as plain fields. Can't read `.apkg`.       |
+| `scripts/anki_utilities/build_apkg.py`     | JSON → `.apkg` with forced note-type ids, `--verify`.                         | Basic/cloze only. Fresh GUIDs every build. `with_media=False`.                         |
+| `scripts/anki_utilities/lint_cards.py`     | Shape checks.                                                                 | Fine as is.                                                                            |
 | `main.py`                   | Piper TTS proof of concept.                                                   | Not wired in.                                                                          |
 
 ## 2. Plugin structure
@@ -64,8 +64,12 @@ skills/create-flash-cards/
   SKILL.md
   references/  card-rules.md  anki-format.md  korean-vocab.md (new)
   scripts/     run as `uv run ${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/scripts/…`
-    tts.py     normalise → Piper → ffmpeg → mp3. No imports from the other scripts.
-    anki_io.py  build_apkg.py  lint_cards.py   (build_apkg imports tts)
+    anki_utilities/   anki_io.py  build_apkg.py  lint_cards.py   (build_apkg imports text_to_speech)
+    text_to_speech/   normalise → Piper → ffmpeg → mp3. No imports from the other scripts.
+      constants.py           CACHE_DIR, VOICE, LetterReadings, Digits, Small/BigUnits
+      text_normalisation.py  TextNormalisation: card text → speech text, Sino-Korean numbers
+      cache_paths.py         CachePaths: audio file names + cache check, voice model, espeak data
+      synthesizer.py         Synthesizer: Piper WAV → ffmpeg MP3, via CachePaths
   assets/notetypes.json
 ```
 
@@ -75,14 +79,27 @@ TTS as an option: when a note type has `Audio`/`AudioSlow` fields,
 collaborator import steps) live in `references/korean-vocab.md`, which is read
 only for Korean decks.
 
-- [ ] Restructure the repo. Remove `venv/`, `install.sh`, `voices/` and
-      `requirements.txt` in favour of the PEP 723 headers.
-- [ ] Update `SKILL.md` paths to `${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/`
+- [x] Restructure the repo into the layout above, with PEP 723 headers on the
+      scripts (`requires-python = ">=3.11"`). `install.sh`, `requirements.txt`
+      and `main.py` removed.
+- [ ] Delete the untracked `venv/` and `voices/` by hand (the voice is already
+      cached in `~/.cache/korean-flashcards/voices/`), then drop their
+      `.gitignore` lines.
+- [x] Update `SKILL.md` paths to `${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/`
       and send output to the user's cwd.
-- [x] `tts.py`: voice + short-path espeak-ng data cached in
-      `~/.cache/korean-flashcards/` on first use; clear error if `ffmpeg` is
-      missing (done in `research/tts.py`, port as-is).
+- [x] Port `research/tts.py` into the `text_to_speech/` package: voice +
+      short-path espeak-ng data cached in `~/.cache/korean-flashcards/` on first
+      use; clear error if `ffmpeg` is missing. Audio file names match the
+      prototype, so the existing cache is reused. `research/tts.py` stays as the
+      copy `build_migration.py` imports until §3 absorbs `research/`.
 - [ ] Add the plugin to the marketplace repo and test a fresh install.
+- [x] **Bug:** `anki_io.py`'s own CLI is broken since `read_deck` started
+      returning a `Deck` dataclass (with `Note`s) instead of a dict. `to-json`
+      crashes on `json.dumps(deck)` (a dataclass isn't serialisable; try
+      `dataclasses.asdict`), and `stats` crashes on `deck["header_lines"]`.
+      `deck_stats` and `write_deck` still index `deck["notes"]` / `n["fields"]`.
+      `from-json` still works, since it hands plain JSON to `write_deck`.
+      `lint_cards.py` is fine: its `load_deck` builds a `Deck` for both formats.
 
 ## 3. Extend: word pairs + current deck → updated deck with audio
 
@@ -111,13 +128,15 @@ Tasks:
       `with_media=True, with_scheduling=False`. `--verify` checks the media.
 - [ ] `anki_io.py`: read an `.apkg` directly (notes, GUIDs, tags, deck per
       card), and lift `#guid column` from TSV.
-- [ ] `tts.py`: `speech_text(korean)` normalisation:
+- [x] `TextNormalisation.speech_text(card_text)` normalisation (same output as
+      the prototype on all 258 deck fields):
   - include optional `(요)`
   - take the first option of `A/B`
   - drop `___` and `[...]`
   - spell out digits (Sino-Korean for amounts and 번)
-  - then `synthesize() -> ko_<sha1(speech_text)[:12]>.mp3`, reusing the cached
-    file if it exists
+  - read Latin letters the Korean way (`A-58번` → 에이 오십팔번)
+  - then `Synthesizer.synthesize() -> ko_<sha1(speech_text)[:12]>.mp3`, reusing
+    the cached file if it exists
 - [ ] Update packages contain only new and changed notes, never the whole deck,
       to keep them small and only touch notes that were actually edited.
 - [ ] Merge: dedupe incoming pairs against the deck (Korean or English match),
@@ -195,15 +214,14 @@ uv run dry_run.py <COPY of collection.anki2> ../KoreanMigration.apkg
   `sqlite3 "file:$HOME/Library/Application Support/Anki2/User 1/collection.anki2?mode=ro" ".backup '<dest>'"`.
   Never run `dry_run.py` on the live file.
 - `research/merge_notetype_test.py` is the original proof that the merge preserves history.
-- The `research/` prototypes become `skills/create-flash-cards/scripts/tts.py` and
-  `…/build_apkg.py` in §2/§3.
+- `research/tts.py` is now `skills/create-flash-cards/scripts/text_to_speech/`.
+  `research/build_migration.py` becomes `…/build_apkg.py` in §3.
 - `KoreanTest.apkg` and `KoreanMigration.apkg` are local build artefacts (gitignored).
-- `venv/`, `voices/`, `install.sh`, `requirements.txt` and `main.py` are now unused.
-  Delete them in the §2 restructure.
+- `venv/` and `voices/` are unused and still need deleting by hand (see §2).
 
 ## Open questions
 
-- ~~espeak-ng long-path failure~~: solved. `tts.py` copies the data to
+- ~~espeak-ng long-path failure~~: solved. `CachePaths.espeak_data()` copies the data to
   `~/.cache/korean-flashcards/espeak-ng-data-<ver>` and passes that path. Verified
   under `uv run`.
 

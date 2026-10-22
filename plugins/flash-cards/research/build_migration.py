@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.10"
+# requires-python = ">=3.11"
 # dependencies = ["anki==26.8.1", "piper-tts==1.8.0"]
 # ///
 """Build the one-off migration package: the existing reversed Korean notes, same GUIDs,

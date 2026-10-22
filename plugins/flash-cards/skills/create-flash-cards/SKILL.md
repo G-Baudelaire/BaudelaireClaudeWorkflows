@@ -9,7 +9,10 @@ Two jobs, one pipeline: **generate** cards from source material, and **improve**
 
 The quality bar is the 8 rules in `references/card-rules.md`. Read that file before writing or editing any card — it is the substance of this skill, not background reading. `references/anki-format.md` covers the file format; read it before producing or parsing a deck file.
 
-**Default output is `.apkg`, not TSV.** `assets/notetypes.json` holds this skill's two canonical note types — `Basic (skill: front/back/extra)` and `Cloze (skill)` — with their templates and CSS. Build with `scripts/build_apkg.py`, which reuses them. Do not invent a note type, and do not restyle these: every deck built by this skill is meant to render identically, and the user already has decks on them. TSV remains available when the user asks for it, or when they are updating a deck in place and need first-field matching to preserve review history.
+**Default output is `.apkg`, not TSV.** `assets/notetypes.json` holds this skill's two canonical note types — `Basic (skill: front/back/extra)` and `Cloze (skill)` — with their templates and CSS. Build with `scripts/anki_utilities/build_apkg.py`, which reuses them. Do not invent a note type, and do not restyle these: every deck built by this skill is meant to render identically, and the user already has decks on them. TSV remains available when the user asks for it, or when they are updating a deck in place and need first-field matching to preserve review history.
+
+Scripts run with `uv run` (each declares its own dependencies) from the user's current
+directory, so `deck.json`, `lint.md` and the finished deck all land there.
 
 ## Workflow
 
@@ -18,7 +21,7 @@ The quality bar is the 8 rules in `references/card-rules.md`. Read that file bef
 If the user attached a deck export, parse it with the bundled script rather than eyeballing it — deck exports contain tabs, embedded newlines, and HTML that break naive parsing:
 
 ```bash
-python3 scripts/anki_io.py to-json <input.txt> -o /home/claude/deck.json
+uv run "${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/scripts/anki_utilities/anki_io.py" to-json <input.txt> -o deck.json
 ```
 
 This gives a JSON array of notes plus the header directives, which is a safe format to edit. Convert back at the end with `from-json`.
@@ -46,7 +49,7 @@ Then write both sides of every card in full (rule 5). If a back can't be written
 Run the linter for the mechanical checks:
 
 ```bash
-python3 scripts/lint_cards.py /home/claude/deck.json --report /home/claude/lint.md
+uv run "${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/scripts/anki_utilities/lint_cards.py" deck.json --report lint.md
 ```
 
 It flags compound fronts, over-long fronts, empty or thin backs, context-dependent references, missing examples, untagged notes, duplicates, and malformed cloze. It is deliberately noisy: it catches shape, not meaning. Read every flag and judge it — a flagged card that is fine stays as it is, and the report should say so.
@@ -79,8 +82,8 @@ Keep the tag vocabulary small — 6-12 tags for a hundred-card deck. A tag appli
 Default path — build a `.apkg` on the canonical note types:
 
 ```bash
-python3 scripts/build_apkg.py /home/claude/deck.json \
-    -o "/mnt/user-data/outputs/<name>.apkg" \
+uv run "${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/scripts/anki_utilities/build_apkg.py" deck.json \
+    -o "<name>.apkg" \
     --deck "Technical Aspects::SQL" --verify
 ```
 
@@ -97,8 +100,8 @@ Use `build_apkg.code_block(snippet)` for code. These note types style `<div clas
 TSV path, when the user asks for it or is updating a deck in place:
 
 ```bash
-python3 scripts/anki_io.py from-json /home/claude/deck.json -o /mnt/user-data/outputs/<name>.txt
-python3 scripts/anki_io.py validate /mnt/user-data/outputs/<name>.txt
+uv run "${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/scripts/anki_utilities/anki_io.py" from-json deck.json -o <name>.txt
+uv run "${CLAUDE_PLUGIN_ROOT}/skills/create-flash-cards/scripts/anki_utilities/anki_io.py" validate <name>.txt
 ```
 
 Then give the user a short report in chat:
@@ -125,6 +128,6 @@ Keep the report proportional. For a 20-card job a paragraph is right; for a 200-
 - `assets/notetypes.json` — the canonical note types: names, **ids**, fields, templates, CSS, and the HTML conventions that CSS expects. Reuse verbatim; never regenerate the ids.
 - `references/card-rules.md` — the 8 rules with worked good/bad pairs and the rewrite patterns for each violation. Read before writing cards.
 - `references/anki-format.md` — import file format, header directives, quoting, HTML conventions, cloze syntax, note type identity and re-import behaviour. Read before producing or parsing a file.
-- `scripts/build_apkg.py` — build a `.apkg` on the canonical note types; `--verify` re-imports and checks it. Also exports `code_block()` for `<div class="code">` snippets.
-- `scripts/anki_io.py` — parse and write Anki TSV/CSV exports safely; `to-json`, `from-json`, `validate`, `stats`.
-- `scripts/lint_cards.py` — mechanical rule checks over a deck JSON; writes a markdown report.
+- `scripts/anki_utilities/build_apkg.py` — build a `.apkg` on the canonical note types; `--verify` re-imports and checks it. Also exports `code_block()` for `<div class="code">` snippets.
+- `scripts/anki_utilities/anki_io.py` — parse and write Anki TSV/CSV exports safely; `to-json`, `from-json`, `validate`, `stats`.
+- `scripts/anki_utilities/lint_cards.py` — mechanical rule checks over a deck JSON; writes a markdown report.
